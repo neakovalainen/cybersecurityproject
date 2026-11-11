@@ -20,7 +20,7 @@
     <p>no polls are available</p>
     {% endif %}
     <form method="post" action="{% url 'polls:logout' %}">
-      {% csrf_token %}
+      <!-- {% csrf_token %} -->
       <button type="submit">logout</button>
     </form>
   </body>

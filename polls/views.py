@@ -1,38 +1,46 @@
 from django.db.models import F
 from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from .models import Choice, Question, Account
 from django.views import generic
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password, identify_hasher
 
 #@login_required
 def index(request):
-    latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    if request.user.is_authenticated:
-      account = Account.objects.get(owner=request.user)
-    else:
-      account = None
-    context = {
-      "latest_question_list": latest_question_list,
-      "account": account,
-    }
-    return render(request, "polls/index.html", context)
+  hashed = make_password("salasana123")
+  print(hashed)
+  print(identify_hasher(hashed).algorithm)
+  latest_question_list = Question.objects.order_by("-pub_date")[:5]
+  if request.user.is_authenticated:
+    account = Account.objects.get(owner=request.user)
+  else:
+    account = None
+  context = {
+    "latest_question_list": latest_question_list,
+    "account": account,
+  }
+  return render(request, "polls/index.html", context)
 
+@csrf_exempt # by removing these
 def detail(request, question_id):
-    try:
-        question = Question.objects.get(pk=question_id)
-    except Question.DoesNotExist:
-        raise Http404("Question does not exist")
-    return render(request, "polls/detail.html", {"question": question})
+  try:
+      question = Question.objects.get(pk=question_id)
+  except Question.DoesNotExist:
+      raise Http404("Question does not exist")
+  return render(request, "polls/detail.html", {"question": question})
 
+@csrf_exempt
 def results(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    return render(request, "polls/results.html", {"question": question})
+  question = get_object_or_404(Question, pk=question_id)
+  return render(request, "polls/results.html", {"question": question})
 
-@login_required
+#@login_required
+@csrf_exempt
 def vote(request, question_id):
   question = get_object_or_404(Question, pk=question_id)
   try:
@@ -54,6 +62,7 @@ def vote(request, question_id):
     selected_choice.save()
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
+@csrf_exempt
 def create_user(request):
   if request.method == "POST":
     form = UserCreationForm(request.POST)
@@ -61,10 +70,14 @@ def create_user(request):
       user = form.save()
       Account.objects.create(owner=user)
       return redirect("/polls/login")
+    else:
+      print(f" passwords {form.data["password1"]} and {form.data["password2"]} do not match")
   else:
     form = UserCreationForm()
 
   return render(request, "polls/create_user.html", {"form": form})
 
+@csrf_exempt
 def loginPage(request):
+  print("logged inn")
   return render(request, 'polls/login.html')
