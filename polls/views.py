@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 
+#@login_required
 def index(request):
     latest_question_list = Question.objects.order_by("-pub_date")[:5]
     if request.user.is_authenticated:
