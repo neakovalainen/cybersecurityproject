@@ -3,4 +3,6 @@
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Login</button>
+  <p>if you do not have an account you can create one from here:</p>
+  <a href="{% url 'polls:create_user' %}">create an account</a>
 </form>

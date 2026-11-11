@@ -1,15 +1,24 @@
 from django.db.models import F
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Choice, Question, Account
 from django.views import generic
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+
 
 def index(request):
     latest_question_list = Question.objects.order_by("-pub_date")[:5]
-    context = {"latest_question_list": latest_question_list}
+    if request.user.is_authenticated:
+      account = Account.objects.get(owner=request.user)
+    else:
+      account = None
+    context = {
+      "latest_question_list": latest_question_list,
+      "account": account,
+    }
     return render(request, "polls/index.html", context)
 
 def detail(request, question_id):
@@ -39,10 +48,23 @@ def vote(request, question_id):
     )
   else:
     selected_choice.votes = F("votes") + 1
+    account = Account.objects.get(owner=request.user)
+    account.times_voted += 1
+    account.save()
     selected_choice.save()
     return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
+def create_user(request):
+  if request.method == "POST":
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+      user = form.save()
+      Account.objects.create(owner=user)
+      return redirect("/polls/login")
+  else:
+    form = UserCreationForm()
 
+  return render(request, "polls/create_user.html", {"form": form})
 
 def loginPage(request):
   return render(request, 'polls/login.html')

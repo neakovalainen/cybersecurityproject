@@ -22,4 +22,4 @@ class Choice(models.Model):
 
 class Account(models.Model):
   owner = models.ForeignKey(User, on_delete=models.CASCADE)
-  times_voted = models.IntegerField()
+  times_voted = models.IntegerField(default=0)
