@@ -10,6 +10,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, identify_hasher
 
+#flaw 3, without login_required tag django does not check whether user has logged in or not
 #@login_required
 def index(request):
   hashed = make_password("salasana123")
@@ -26,7 +27,8 @@ def index(request):
   }
   return render(request, "polls/index.html", context)
 
-@csrf_exempt # by removing these
+#flaw 4, csrf tags disable csrf token check from specific views
+@csrf_exempt
 def detail(request, question_id):
   try:
       question = Question.objects.get(pk=question_id)

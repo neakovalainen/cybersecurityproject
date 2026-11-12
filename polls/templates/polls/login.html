@@ -1,6 +1,5 @@
 <h2>Login</h2>
 <form method="post">
-  <!-- and by uncommenting these from all html post forms -->
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Login</button>

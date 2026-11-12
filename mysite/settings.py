@@ -44,7 +44,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # and by uncommenting line below as as well
+    # removing, csrf middleware disables it everywhere
     #'django.middleware.csrf.CsrfViewMiddleware'
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -82,8 +82,7 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+# flaw 2, disabled passwordvalidators
 
 AUTH_PASSWORD_VALIDATORS = [
     
@@ -131,6 +130,7 @@ LOGIN_REDIRECT_URL = "/polls/"
 
 LOGOUT_REDIRECT_URL = "/polls/login"
 
+# flaw 5, removing the lines below enables django to use its standard passwordhasher pbkdf2sha256 instead of insecure md5
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
